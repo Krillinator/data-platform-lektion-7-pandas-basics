@@ -1,11 +1,15 @@
 # Pandas Data Cleaning & Helper Methods
 
+## About this Repository
+
 Small demo project showing how to work with pandas DataFrames, clean messy data, and use common helper methods.
 Used as an introduction to transformations, data quality, and basic ETL thinking.
 
+
+
 ---
 
-## Clone
+## Clone Repository
 ```bash
 git clone <REPO_URL>
 cd <REPO_NAME>
@@ -17,15 +21,15 @@ cd <REPO_NAME>
 
 This project uses **uv** with a local virtual environment.
 
-### Install dependencies (including pandas)
+### Install dependencies
 ```bash
-uv add pandas
+uv add pandas     # Unnecessary if repository was cloned, sync instead
 uv sync
 ```
 
-### Run the script
+### Start App
 ```bash
-uv run python main.py
+uv run python main.py 
 ```
 
 ---
@@ -56,7 +60,7 @@ Think of it as:
 * Excel sheet 
 * CSV in memory
 
-<img width="609" height="497" alt="Screenshot 2026-02-10 at 13 53 25" src="https://github.com/user-attachments/assets/23ead47b-1544-47dc-8895-3d88e7d07b83" />
+<img width="400" alt="Screenshot 2026-02-10 at 13 53 25" src="https://github.com/user-attachments/assets/23ead47b-1544-47dc-8895-3d88e7d07b83" />
 
 
 ### Series
@@ -68,7 +72,7 @@ df["price"]
 
 Most helper methods are called on a Series. Therefore it's important to understand the datatypes that are returned
 
-<img width="684" height="390" alt="Screenshot 2026-02-10 at 13 53 43" src="https://github.com/user-attachments/assets/9ec90df9-69b5-4f74-8e84-3b66d103478f" />
+<img width="400" alt="Screenshot 2026-02-10 at 13 53 43" src="https://github.com/user-attachments/assets/9ec90df9-69b5-4f74-8e84-3b66d103478f" />
 
 ---
 
@@ -171,6 +175,19 @@ df["price"] = df["price"].astype(float)
 Common use cases:
 * numbers loaded as strings 
 * calculations failing because dtype is wrong
+
+> ⚠️ **Warning**
+> This will crash the app if the string example is: "abc"
+> 
+> Instead, use `to_numeric()` like so:
+> ```python
+>dirty_df["price"] = pd.to_numeric(dirty_df["price"], errors="coerce")
+>
+>    bad_rows = dirty_df[dirty_df["price"].isna()]
+>    print("---DEBUGGING---")
+>    print(bad_rows.values)
+> ```
+
 
 ---
 
