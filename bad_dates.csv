@@ -1,0 +1,6 @@
+id,name,price,currency,created_at,updated_at,flag_bad_date
+SKU-1,shoes,760,SEK,2024-01-10,2024-01-11,False
+SKU-2,pants,520,SEK,2024-02-15,,True
+SKU-3,shirts,450,SEK,,2024-02-01,True
+SKU-4,skirts,550,SEK,,2024-03-01,True
+SKU-5,designer jacket,-5000,SEK,2035-05-01,2024-04-01,False

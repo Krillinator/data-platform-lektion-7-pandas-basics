@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 
 if __name__ == '__main__':
@@ -8,7 +10,7 @@ if __name__ == '__main__':
             "id": ["SKU-1", "SKU-2", "SKU-3", "SKU-4", "SKU-5"],
             "name": ["shoes", "pants", "shirts", "sweaters", "designer jacket"],
             "price": [760, 520, 450, 550, 4500],
-            "currency": ["SEK", "SEK", "SEK", "SEK", "SEK"], # TODO - Missing Values for CSV files when loaded (Crash)
+            "currency": ["SEK", "SEK", "SEK", "SEK", "SEK"],
         }
     )
 
@@ -62,7 +64,7 @@ if __name__ == '__main__':
     # SKU--4 -> Multiple "-" would not be fixed
     # These require validation rules, not just cleaning
 
-    dirty_df["price"] = dirty_df["price"].astype(float)
+    # dirty_df["price"] = dirty_df["price"].astype(float)
     # Explicit type casting: string -> float
 
     dirty_df["price"] = pd.to_numeric(dirty_df["price"], errors="coerce")
@@ -109,3 +111,107 @@ if __name__ == '__main__':
     missing_df["currency_missing"] = missing_df["currency"].isna()
 
     print(missing_df)
+
+    # Dataset with Branching response
+    branching_df = pd.DataFrame(
+        {
+            "id": ["SKU-1", "SKU-2", "SKU-3", "", "SKU-5"],
+            "name": ["shoes", "pants", "shirts", "", "designer jacket"],
+            "price": [760, 520, 450, 550, -5000],
+            "currency": ["SEK", "SEK", "SEK", "SEK", "SEK"],
+        }
+    )
+
+    # -------------------------
+    # Define rejection rules
+    # -------------------------
+
+    reject_condition = (
+            (branching_df["id"] == "") |
+            (branching_df["price"] < 0)
+    )
+
+    # -------------------------
+    # Separate rejected rows
+    # -------------------------
+
+    df_rejected = branching_df[reject_condition].copy()
+    df_valid = branching_df[~reject_condition].copy()
+
+    # -------------------------
+    # Add rejection reason (optional but recommended)
+    # -------------------------
+
+    df_rejected["reason"] = ""
+
+    df_rejected.loc[df_rejected["id"] == "", "reason"] = "Missing ID"
+    df_rejected.loc[df_rejected["price"] < 0, "reason"] = "Negative price"
+
+    # -------------------------
+    # Save rejected to file
+    # -------------------------
+
+    df_rejected.to_csv("rejected_products.csv", index=False)
+
+    print("Valid rows:")
+    print(df_valid)
+
+    print("\nRejected rows:")
+    print(df_rejected)
+
+    # Dataset with dates
+    dates_df = pd.DataFrame(
+        {
+            "id": ["SKU-1", "SKU-2", "SKU-3", "SKU-4", "SKU-5"],
+            "name": ["shoes", "pants", "shirts", "skirts", "designer jacket"],
+            "price": [760, 520, 450, 550, -5000],
+            "currency": ["SEK", "SEK", "SEK", "SEK", "SEK"],
+            "created_at": [
+                "2024-01-10",  # valid ISO
+                "2024/02/15",  # different separator
+                "15-01-2023",  # european format
+                "2024-13-01",  # invalid month
+                "2035-05-01",  # future date
+            ],
+            "updated_at": [
+                "2024-01-11",
+                None,          # missing
+                "2024-02-01",
+                "2024-03-01",
+                "2024-04-01"
+            ]
+        }
+    )
+
+    dates_df["created_at"] = (dates_df["created_at"]
+                                  .str.strip()
+                                  .str.replace("/", "-", regex = False)
+                                  )
+
+    dates_df["created_at"] = pd.to_datetime(dates_df["created_at"]
+                                            .str.strip()
+                                            .str.replace("/", "-", regex=False), errors="coerce", yearfirst=True
+                                            )
+
+    dates_df["flag_bad_date"] = (
+            dates_df["created_at"].isna() |
+            dates_df["updated_at"].isna()
+    )
+
+    reject_condition = dates_df["updated_at"] < dates_df["created_at"]
+
+    df_rejected = dates_df[reject_condition].copy()
+    df_valid = dates_df[~reject_condition].copy()
+
+    dates_df.to_csv("bad_dates.csv", index=False)
+
+
+    # Read from .csv file with JSONB data
+    products_jsonb = pd.read_csv("products_raw.csv")
+    print(products_jsonb)
+
+    products_jsonb["payload"] = products_jsonb["payload"].apply(json.loads)
+    print(products_jsonb)
+
+    payload_df = pd.json_normalize(products_jsonb["payload"])
+    print(payload_df)

@@ -1,0 +1,3 @@
+id,name,price,currency,reason
+,,550,SEK,Missing ID
+SKU-5,designer jacket,-5000,SEK,Negative price
