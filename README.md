@@ -39,11 +39,25 @@ A DataFrame is a table-like structure with rows and columns.
 df = pd.DataFrame({...})
 ```
 
+```python
+    product_df = pd.DataFrame(
+        {
+            "id": ["SKU-1", "SKU-2", "SKU-3", "SKU-4", "SKU-5"],
+            "name": ["shoes", "pants", "shirts", "sweaters", "designer jacket"],
+            "price": [760, 520, 450, 550, 4500],
+            "currency": ["SEK", "SEK", "SEK", "SEK", "SEK"], # TODO - Missing Values for CSV files when loaded (Crash)
+        }
+    )
+```
+
 Think of it as:
 
 * SQL table 
 * Excel sheet 
 * CSV in memory
+
+<img width="609" height="497" alt="Screenshot 2026-02-10 at 13 53 25" src="https://github.com/user-attachments/assets/23ead47b-1544-47dc-8895-3d88e7d07b83" />
+
 
 ### Series
 
@@ -52,9 +66,12 @@ A Series represents a single column in a DataFrame.
 df["price"]
 ```
 
-Most helper methods are called on a Series.
+Most helper methods are called on a Series. Therefore it's important to understand the datatypes that are returned
+
+<img width="684" height="390" alt="Screenshot 2026-02-10 at 13 53 43" src="https://github.com/user-attachments/assets/9ec90df9-69b5-4f74-8e84-3b66d103478f" />
 
 ---
+
 
 ## Helper Methods
 ### Numeric helpers 
@@ -83,9 +100,27 @@ Quick stats for numeric columns.
 df.describe()
 ```
 
+<img width="161" height="202" alt="Screenshot 2026-02-10 at 13 55 28" src="https://github.com/user-attachments/assets/e3557087-e4e2-4365-9aa6-e77ec62cacdf" />
+
+
 ## String helpers (.str)
 
-Used when cleaning text.
+Consider the following Dataframe
+
+```python
+    dirty_df = pd.DataFrame(
+        {
+            "id": [" sku-1 ", "SKU- 2", "Sku-3", "sku_4", "SKU-5 "],
+            "name": [" Shoes", "pants ", "SHIRTS", " SweaTers ", "designer  jacket"],
+            "price": [" 760 ", "520", " 450", "550 ", " 4500"],
+            "currency": [" sek", "SEK ", "Sek", "sek ", " SEK"],
+        }
+    )
+```
+
+Transformation of data often requires cleaning data, that's when datatype helpers can come in handy.
+
+### Used when cleaning text.
 
 ```python
 df["id"].str.strip()     # Remove whitespace start/end
