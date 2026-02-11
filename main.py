@@ -39,9 +39,9 @@ if __name__ == '__main__':
     # Simulated messy / real-world input data
     dirty_df = pd.DataFrame(
         {
-            "id": [" sku-1 ", "SKU- 2", "Sku-3", "sku_4", "SKU5 "],
+            "id": [" sku-1 ", "SKU- 2", "Sku-3", "sku_4", "SKU-5 "],
             "name": [" Shoes", "pants ", "SHIRTS", " SweaTers ", "designer  jacket"],
-            "price": [" 760 ", "520", " 450", "550 ", " 4500"],
+            "price": [" 760 ", "520", " 450", "", " 4500"],
             "currency": [" sek", "SEK ", "Sek", "sek ", " SEK"],
         }
     )
@@ -64,6 +64,15 @@ if __name__ == '__main__':
 
     dirty_df["price"] = dirty_df["price"].astype(float)
     # Explicit type casting: string -> float
+
+    dirty_df["price"] = pd.to_numeric(dirty_df["price"], errors="coerce")
+    # safely converts invalid values to NaN (astype would crash on bad data)
+    # Example: "abc" converted to float wouldn't work == crash
+    # to_numeric solves this problem
+
+    bad_rows = dirty_df[dirty_df["price"].isna()]
+    print("---DEBUGGING---")
+    print(bad_rows.values)
 
     dirty_df["name"] = dirty_df["name"].str.strip()
     dirty_df["name"] = dirty_df["name"].str.title()
